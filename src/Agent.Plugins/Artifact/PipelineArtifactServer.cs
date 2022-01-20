@@ -45,7 +45,7 @@ namespace Agent.Plugins
             int pipelineId,
             string name,
             string source,
-            IDictionary<string, string> properties,
+            string userProperties,
             CancellationToken cancellationToken)
         {
             VssConnection connection = context.VssConnection;
@@ -79,18 +79,11 @@ namespace Agent.Plugins
                 // 2) associate the pipeline artifact with an build artifact
                 BuildServer buildServer = new BuildServer(connection);
 
-                // Prevent custom properties from overwriting computed ones below
-                if (properties != null)
-                {
-                    properties.Remove(PipelineArtifactConstants.RootId);
-                    properties.Remove(PipelineArtifactConstants.ProofNodes);
-                    properties.Remove(PipelineArtifactConstants.ArtifactSize);
-                }
-
-                Dictionary<string, string> propertiesDictionary = new Dictionary<string, string>(properties);
+                Dictionary<string, string> propertiesDictionary = new Dictionary<string, string>();
                 propertiesDictionary.Add(PipelineArtifactConstants.RootId, result.RootId.ValueString);
                 propertiesDictionary.Add(PipelineArtifactConstants.ProofNodes, StringUtil.ConvertToJson(result.ProofNodes.ToArray()));
                 propertiesDictionary.Add(PipelineArtifactConstants.ArtifactSize, result.ContentSize.ToString());
+                propertiesDictionary.Add(PipelineArtifactConstants.UserProperties, userProperties);
 
                 BuildArtifact buildArtifact = await AsyncHttpRetryHelper.InvokeAsync(
                     async () => 

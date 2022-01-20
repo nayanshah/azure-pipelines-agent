@@ -64,7 +64,7 @@ namespace Agent.Plugins.PipelineArtifact
         private static readonly Regex jobIdentifierRgx = new Regex("[^a-zA-Z0-9 - .]", RegexOptions.Compiled | RegexOptions.CultureInvariant);
         private const string pipelineType = "pipeline";
         private const string fileShareType = "filepath";
-        private const string customProperties = "properties";
+        private const string userProperties = "userproperties";
 
         protected override async Task ProcessCommandInternalAsync(
             AgentTaskPluginExecutionContext context,
@@ -85,8 +85,8 @@ namespace Agent.Plugins.PipelineArtifact
 
             string defaultWorkingDirectory = context.Variables.GetValueOrDefault("system.defaultworkingdirectory").Value;
 
-            string propertiesStr = context.GetInput(customProperties);
-            IDictionary<string, string> properties = ParseCustomProperties(propertiesStr);
+            string userPropertiesValue = context.GetInput(userProperties);
+            IDictionary<string, string> properties = ParseCustomProperties(userPropertiesValue);
 
             bool onPrem = !String.Equals(context.Variables.GetValueOrDefault(WellKnownDistributedTaskVariables.ServerType)?.Value, "Hosted", StringComparison.OrdinalIgnoreCase);
             if (onPrem)
